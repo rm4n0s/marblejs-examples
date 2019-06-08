@@ -1,4 +1,5 @@
 import * as path from "path";
+import * as fs from "fs";
 import {
   createServer,
   combineRoutes,
@@ -6,8 +7,7 @@ import {
   r,
   use
 } from "@marblejs/core";
-import { mergeMap, map } from "rxjs/operators";
-import { readFile } from "@marblejs/core/dist/+internal";
+import {  map } from "rxjs/operators";
 import { requestValidator$, t } from "@marblejs/middleware-io";
 
 const STATIC_PATH = path.resolve(__dirname, "./static");
@@ -23,7 +23,7 @@ const getStatic$ = r.pipe(
     req$.pipe(
       use(getFileValidator$),
       map(req => req.params.dir),
-      mergeMap(readFile(STATIC_PATH)),
+      map(dir => fs.createReadStream(path.resolve(STATIC_PATH, dir))),
       map(body => ({ body }))
     )
   )
